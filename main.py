@@ -1,9 +1,4 @@
 
-# coding: utf-8
-
-# In[1]:
-
-
 # coding: UTF-8
 
 import numpy as np
@@ -58,7 +53,6 @@ def main():
         print("p:{0:.4f} r:{1:.4f} f1:{2:.4f}".format(
             *precision_recall_fscore_support(y_test, preds, average="macro")))
 
-    # ここから先だけ追加した
     stcl = StackingClassifier(estimators, RFC(n_estimators=2000, n_jobs=-1))
     stcl.fit(X_train, y_train)
     preds = stcl.predict(X_test)
@@ -68,62 +62,3 @@ def main():
     
 if __name__ == "__main__":
     main()
-
-
-# In[19]:
-
-
-digits = load_digits()
-noised_data = digits.data + np.random.random(digits.data.shape)*15
-
-X_train, X_test, y_train, y_test = train_test_split(
-    noised_data, digits.target, test_size=0.8)
-
-svm =SVC(C=5, gamma=0.001, probability=True)
-lr = LogisticRegression()
-knn = KNN(n_jobs=-1)
-nb = GNB()
-rfc = RFC(n_estimators=500, n_jobs=-1)
-bgg = BaggingClassifier(n_estimators=300, n_jobs=-1)
-mlp = MLPClassifier(hidden_layer_sizes=(40, 20), max_iter=1000)
-xgb = XGBClassifier(n_estimators=300, n_jobs=-1)
-
-estimators = list(zip(["svm","lr","knn","nb","rfc","bgg","mlp", "xgb"], 
-                      [svm, lr, knn, nb, rfc, bgg, mlp, xgb]))
-estimators
-
-
-# In[20]:
-
-
-for name, clf in estimators:
-        clf.fit(X_train, y_train)
-        preds = clf.predict(X_test)
-        print(name)
-        print("p:{0:.4f} r:{1:.4f} f1:{2:.4f}".format(
-            *precision_recall_fscore_support(y_test, preds, average="macro")))
-
-
-# In[21]:
-
-
-for v in ["hard", "soft"]:
-        vc_hard = VotingClassifier(estimators, voting=v)
-        vc_hard.fit(X_train, y_train)
-        preds = vc_hard.predict(X_test)
-        print(v, "voting")
-        print("p:{0:.4f} r:{1:.4f} f1:{2:.4f}".format(
-            *precision_recall_fscore_support(y_test, preds, average="macro")))
-
-
-# In[22]:
-
-
-# stacking
-stcl = StackingClassifier(estimators, RFC(n_estimators=2000, n_jobs=-1))
-stcl.fit(X_train, y_train)
-preds = stcl.predict(X_test)
-print("stacking")
-print("p:{0:.4f} r:{1:.4f} f1:{2:.4f}".format(
-        *precision_recall_fscore_support(y_test, preds, average="macro")))
-
